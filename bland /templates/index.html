@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI on the Run</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Enter your name and number to experience the AI on the run</h1>
+        <form id="callForm">
+            <input type="text" id="name" placeholder="Enter your name" required>
+            
+            <div class="phone-input">
+                <select id="countryCode" required>
+                    <option value="+1">+1 (USA)</option>
+                    <option value="+44">+44 (UK)</option>
+                    <option value="+91">+91 (India)</option>
+                    <option value="+61">+61 (Australia)</option>
+                    <option value="+49">+49 (Germany)</option>
+                    <!-- Add more country codes as needed -->
+                </select>
+                <input type="text" id="phoneNumber" placeholder="Enter your number" required>
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        document.getElementById('callForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the default form submission
+
+            const name = document.getElementById('name').value;
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const fullPhoneNumber = countryCode + phoneNumber;
+
+            fetch('/send_calls', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: name, phone_number: fullPhoneNumber })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to send calls');
+                }
+            })
+            .then(data => {
+                document.getElementById('status').innerText = `Batch sent successfully with ID: ${data.batch_id}`;
+            })
+            .catch(error => {
+                document.getElementById('status').innerText = error.message;
+            });
+        });
+    </script>
+</body>
+</html>
+
